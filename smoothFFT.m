@@ -1,4 +1,4 @@
-function [p, f] = smoothFFT(sig, Fs)
+function varargout = smoothFFT(varargin)
 % SMOOTHFFT:フレームシフト平滑化スペクトル
 % Usage; [p, f] = smoothFFT(sig, [Fs]) *Fsの入力を任意にする改良をする
 %   [Inputs]
@@ -8,6 +8,18 @@ function [p, f] = smoothFFT(sig, Fs)
 %       p  ;Power in dB
 %       f  ;Frequency in Hertz
 %       2021/1/19  by K.Kamura
+argMin = 1; argMax = 9999;
+if nargin < argMin || nargin > argMax
+    error('Invalid number of Input')
+elseif nargin == 1
+    sig = varargin{1};
+    Fs = 48000;
+elseif nargin == 2
+    sig = varargin{1};
+    Fs = varargin{2};
+else
+    error('Internal error')
+end
 
 ratio = 3/4;    % 前のフレームと何%重ねるか
 frameLength = 4096;
@@ -31,7 +43,7 @@ for startP = 1:frameShift:(length(sig)-frameLength)
     cnt = cnt + 1;
     
     % --- Status --- %%%
-    percentDone = (cnt/frameNum);
+    percentDone = (cnt/(frameNum-1));
     msg0 = sprintf(msgstr, percentDone*100);
     msg1 = repmat('#', 1, round((col-c)*percentDone));
     msg2 = repmat('.', 1, round((col-c)*(1-percentDone)));
@@ -43,4 +55,13 @@ fprintf("\n")
 p = p ./ cnt;
 df = Fs./frameLength;
 f = linspace(0, Fs-df, frameLength);
+if nargout == 0
+    semilogx(f, p)
+    xlabel_freq
+    ylabel('Power [dB]')
+    grid on
+else
+    varargout{1} = p;
+    varargout{2} = f;
+end
 end
