@@ -1,5 +1,6 @@
 function eqedit
 fontsize = 26;
+<<<<<<< HEAD
 
 v = get(0, 'MonitorPosition');
 X_MIN = v(1, 3)*0.2;
@@ -8,6 +9,14 @@ WIDTH = v(1, 3)*0.4;
 HEIGHT = v(1, 3)*0.2;
 H = GUIobject;
 H.Params = '$$$$';
+=======
+X_MIN = 300;
+Y_MIN = 200;
+WIDTH = 750;
+HEIGHT = 380;
+H = GUIobject;
+H.Params = '';
+>>>>>>> 82c0bd533178eb45b6cd41bd6d223f2844f9fe33
 
 H.Mainfig = figure(...
     'Position', [X_MIN Y_MIN WIDTH HEIGHT],...
@@ -35,6 +44,10 @@ H.EditBox = uicontrol(H.Mainfig,...
     'FontSize', fontsize,...
     'FontName', 'Ricty Diminished',...
     'Tooltip', hint,...
+<<<<<<< HEAD
+=======
+    'HorizontalAlignment', 'left',...
+>>>>>>> 82c0bd533178eb45b6cd41bd6d223f2844f9fe33
     'KeyPressFcn', @(obj,eve)keypress);
 xm = WIDTH*0.085 + w; w = 50;
 uicontrol(H.Mainfig,...
@@ -45,7 +58,11 @@ uicontrol(H.Mainfig,...
     'FontName', 'Ricty Diminished');
 xm = WIDTH*0.01;
 uicontrol(H.Mainfig,...
+<<<<<<< HEAD
     'Style', 'text',...vz
+=======
+    'Style', 'text',...
+>>>>>>> 82c0bd533178eb45b6cd41bd6d223f2844f9fe33
     'String', '$$',...
     'Position', [xm ym w h],...
     'FontSize', fontsize,...
@@ -61,9 +78,13 @@ uicontrol(H.Mainfig,...
 uicontrol(H.EditBox)
 
     function keypress
+<<<<<<< HEAD
         H.EditBox
         str = ['$$' H.EditBox.String '$$'];
         H.Text.String
+=======
+        str = ['$$' H.EditBox.String '$$'];
+>>>>>>> 82c0bd533178eb45b6cd41bd6d223f2844f9fe33
         set(H.Text, 'String', str);
     end
 
