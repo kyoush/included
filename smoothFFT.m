@@ -21,7 +21,7 @@ else
     error('Internal error')
 end
 
-ratio = 3/4;    % 前のフレームと何%重ねるか
+ratio = 1/2;    % 前のフレームと何%重ねるか
 frameLength = 4096;
 
 frameShift = frameLength*(1-ratio);
