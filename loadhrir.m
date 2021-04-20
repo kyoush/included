@@ -1,4 +1,4 @@
-function hrir = loadhrir(varargin)
+ function hrir = loadhrir(varargin)
 % LOADHRIR: 任意のelev, azimが与えられたとき、左右のhrirを返す関数
 % Usage: hrir = LOADHRIR(elev, azim, [d, name])
 % [Inputs]
@@ -15,7 +15,7 @@ function hrir = loadhrir(varargin)
 % 2020/11/30  ファイルが存在しない場合、1点目が1、それ以外が0の512点のただのインパルスを返す
 
 if nargin < 2 || nargin > 4
-    error('Invalid numer of arguments')
+    error('Invalid number of arguments')
 else
     elev = string(varargin(1));
     azim = string(varargin(2));
@@ -57,7 +57,8 @@ if d > 1.15
 else
     filename = strcat('D:/kamura/HRTF/TPU/', name,'/hrir/hrir_', num2str(d), '_l.mat');
     if exist(filename, 'file') == 0
-        impulse = zeros(512, 1); impulse(1) = 1;
+%         warning('File does not exist');
+        impulse = zeros(512, 1); impulse(1) = 1; impulse = circshift(impulse, 256);
         hrir.hrirL = impulse;
         hrir.hrirR = impulse;
     else

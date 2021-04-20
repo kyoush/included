@@ -1,3 +1,1 @@
-function ccc
-clear; close all; clc;
-end
+clear; close all force; clc;
