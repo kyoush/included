@@ -1,32 +1,34 @@
-function varargout = plotSpectrogram(varargin)
+function varargout = plotSpectrogram(sig, Fs, scale, frameLength, overlap, NFFT, dBLim)
 % PLOTSPECTROGRAM:plot spectrogram of audio signal
-% [spec, time, freq] = PLOTSPECTROGRAM(sig, [Fs, YScale])
+% Usage; [spec, time, freq] = PLOTSPECTROGRAM(sig, [Fs, YScale, frameLength, overlap, NFFT, dBLim])
 %
 % [Input] arguments in [] are optional
-%   sig   :audio signal
-%   Fs    :Sample Rate [Hz] Default:48 kHz
-%   YScale:scale of yaxis ['log'[Defalut] or 'linear']
+%   sig         :audio signal
+%   Fs          :Sample Rate [Hz]                   Default:48 kHz
+%   YScale      :scale of yaxis ['log' or 'linear'] Default:'log'
+%   frameLength :frame length [points]              Default:1024
+%   overlap     :overlap of frame (ex. 1/2, 3/4, 1) Default:1/2
+%   NFFT        :length of FFT                      Default:4096
+%   dBLim       :limits of colormap [dB]            Default:[-60 40]
 %
 % [Output]
 %   spec  :spectrogram data
 %   time  :time axis
 %   freq  :frequency axis
-nInMin = 1; nInMax = 3;
-if nargin < nInMin || nargin > nInMax
-    error("Invalid number of Input");
-else
-    sig = varargin{1};
-    Fs = 48000;
-    scale = "log";
-    if nargin == 2
-        Fs = varargin{2};
-    elseif nargin == 3
-        tmpStr = varargin{3};
-        if tmpStr == "log" || tmpStr == "linear"
-            scale = tmpStr;
-        end
-    end
+
+% - Release Notes -
+% #[1.0] -2021/4/20 by K.Kamura
+
+arguments
+    sig double
+    Fs (1, 1) double = 48000
+    scale string = 'log'
+    frameLength (1, 1) double = 1024
+    overlap (1, 1) double = 1/2;
+    NFFT (1, 1) = 4096;
+    dBLim (1, 2) double = [-60 40];
 end
+
 if nargout == 3
     plotFlag = 0;
 elseif nargout == 0
@@ -35,16 +37,10 @@ else
     error("Invalid number of Output");
 end
 
-frameLength = 1024;
-overlap = 3/4;
 frameShift = ceil(overlap * frameLength);
-NFFT = 4096;
-
-dBLim = [-60 40];
-
 nChannel = size(sig, 2);
-nFrame = ceil((size(sig, 1) - frameShift)/frameLength);
-lengthSignal = frameShift + nFrame * frameLength;
+nFrame = ceil((size(sig, 1) - frameLength)/frameShift);
+lengthSignal = frameLength + frameShift * nFrame;
 sig = [sig;
     zeros(lengthSignal-size(sig, 1), nChannel)];
 time = linspace(0, size(sig, 1)/Fs, nFrame);
@@ -54,7 +50,7 @@ for channel = 1:nChannel
     if plotFlag == 1
         plotSig = sig(:, channel);
         spec = plotSpectrogramFnc;
-        figure;
+        figname = strcat("Channel ", num2str(channel)); figure('Name', figname);
         ax = axes;
         surf(ax, time, freq, spec,...
             'LineStyle', 'none'); view(0, 90);
@@ -88,6 +84,7 @@ end
     function spec = plotSpectrogramFnc
         spec = zeros(NFFT, nFrame);
         cntFrame = 1;
+        win = hann(frameLength);
         
         % Status
         reverseStr = '';
@@ -95,12 +92,12 @@ end
         col = sizeCommand(1) - 2;
         msgstr = '%5.1f%%%%';
         c = length(sprintf(msgstr, 100.0));
-        for startPoint = 1:frameLength:nFrame*frameLength - frameLength
+        for startPoint = 1:frameShift:nFrame*frameShift
             tmp = plotSig(startPoint:startPoint+frameLength-1);
-            spec(:, cntFrame) = 20*log10(abs(fft(tmp, NFFT)));
+            spec(:, cntFrame) = 20*log10(abs(fft(win.*tmp, NFFT)));
             
             % Status
-            percentDone = (cntFrame/(nFrame-1));
+            percentDone = cntFrame/nFrame;
             cntFrame = cntFrame + 1;
             msg0 = sprintf(msgstr, percentDone*100);
             msg1 = repmat('#', 1, round((col-c)*percentDone));
@@ -109,6 +106,5 @@ end
             fprintf([reverseStr msg]);
             reverseStr = repmat(sprintf('\b'), 1, length(msg)-1);
         end
-        
     end
 end
