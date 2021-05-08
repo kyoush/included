@@ -5,7 +5,7 @@ function varargout = plotSpectrogram(sig, Fs, scale, frameLength, overlap, NFFT,
 % [Input] arguments in [] are optional
 %   sig         :audio signal
 %   Fs          :Sample Rate [Hz]                   Default:48 kHz
-%   YScale      :scale of yaxis ['log' or 'linear'] Default:'log'
+%   YScale      :scale of yaxis ['log' or 'linear'] Default:'linear'
 %   frameLength :frame length [points]              Default:1024
 %   overlap     :overlap of frame (ex. 1/2, 3/4, 1) Default:1/2
 %   NFFT        :length of FFT                      Default:4096
@@ -22,7 +22,7 @@ function varargout = plotSpectrogram(sig, Fs, scale, frameLength, overlap, NFFT,
 arguments
     sig double
     Fs (1, 1) double = 48000
-    scale string = 'log'
+    scale string = 'linear'
     frameLength (1, 1) double = 1024
     overlap (1, 1) double = 1/2;
     NFFT (1, 1) = 4096;
@@ -50,7 +50,15 @@ for channel = 1:nChannel
     if plotFlag == 1
         plotSig = sig(:, channel);
         spec = plotSpectrogramFnc;
-        figname = strcat("Channel ", num2str(channel)); figure('Name', figname);
+        figname = strcat("Channel ", num2str(channel));
+        f = figure('Name', figname,...
+            'Toolbar', 'none');
+        fp = f.Position;
+        xm = 70; ym = fp(4)-25; w = fp(3)*0.1; h = fp(4)*0.05;
+        bt = uicontrol(f,...
+            'Position', [xm ym w h],...
+            'String', 'Play',...
+            'Callback', 'sound(sig, Fs)');
         ax = axes;
         surf(ax, time, freq, spec,...
             'LineStyle', 'none'); view(0, 90);
